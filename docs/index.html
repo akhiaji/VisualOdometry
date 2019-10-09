@@ -3,7 +3,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="utf-8">
   <title>Computer Vision Class Project
-  | CS, Virginia Tech | Fall 2019: CS 6476</title>
+  | CS, Georgia Tech | Fall 2019: CS 6476</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -49,12 +49,11 @@ color: #FF9900;
 
 We will develop a visual odometry system that tracks the pose of the camera throughout a video sequence. This involves elements of feature detection and matching, image rotation and translation, and consensus gathering to build a complex system.<br><br>
 <!-- figure -->
-<h3>Teaser figure</h3>
-A figure that conveys the main idea behind the project or the main application being addressed.
+<h4>Visual Odometry in Practice:</h4>
 <br><br>
 <!-- Main Illustrative Figure -->
 <div style="text-align: center;">
-<img style="height: 200px;" alt="" src="mainfig.png">
+<img style="height: 400px;" alt="" src="vo.jpg">
 </div>
 
 <br><br>
@@ -86,33 +85,36 @@ This problem is particularly interesting because it combines many of the tools w
 <br><br>
 <!-- Results -->
 <h3>Experiments and results</h3>
-Provide details about the experimental set up (number of images/videos, number of datasets you experimented with, train/test split if you used machine learning algorithms, etc.). Describe the evaluation metrics you used to evaluate how well your approach is working. Include clear figures and tables, as well as illustrative qualitative examples if appropriate. Be sure to include obvious baselines to see if your approach is doing better than a naive approach (e.g. for classification accuracy, how well would a classifier do that made random decisions?). Also discuss any parameters of your algorithms, and tell us how you set the values of those parameters. You can also show us how the performance varies as you change those parameter values. Be sure to discuss any trends you see in your results, and explain why these trends make sense. Are the results as expected? Why?
+Upon implementing our visual odometry algorithm, we will assess its performance on several unseen datasets by comparing the ground truth labels with the labels our system generates at each frame. Success in our task will be determined by a low error between our predicted poses and the ground truth poses.
+<br></br>
+
+We plan to implement the core algorithm ourselves while using libraries such as numpy and PyTorch to handle the computations. For feature detection, (which we utilize when comparing pairs of frames to determine the translation between them), we plan on using our own implementation of the SIFT algorithm. 
+<br></br>
+
+The datasets we will be using come from the computer vision group of the Technical University of Munich Department of Informatics. They provide several videos with rgb-d data as well as ground truth camera pose information. While implementing and tuning our dataset, we will use sequence <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg1_floor">freiburg1_floor</a>, which is a video going over the wooden floor of an office as well as <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg2_large_no_loop">reiburg2_large_no_loop</a>. We will then test and analyze performance against the other datasets that have been made available.
+
 
 <br><br>
 
 <!-- Main Results Figure -->
 <div style="text-align: center;">
-<img style="height: 300px;" alt="" src="results.png">
+<img style="height: 300px;" alt="" src="data.png">
+<img style="height: 300px;" alt="" src="data2.png">
 </div>
 <br><br>
 
-<!-- Results -->
-<h3>Qualitative results</h3>
-Show several visual examples of inputs/outputs of your system (success cases and failures) that help us better understand your approach.
-<br><br>
+To evaluate our approach, we will compare our frame position tags to the ground truth positions provided in the dataset using the root mean squared error over multiple trials. If there are any major outliers in the dataset, we will additionally use other more robust metrics such as the median error or average error without the square. A common issue that we might face with our experiments is drift. Since we’re incrementally computing the pose after each frame, any errors we make will affect the pose calculations in the next frame and so on. These errors can accumulate and cause our overall estimated path to significantly differ from the actual path. If this turns out to be an issue with our dataset, then we will look into methods to combat this such as ‘sliding window adjustment’, in which we group a window of previous frames and backpropagate a measure of error such as RMSE to correct and update previous pose calculations. 
 
-<!-- Main Results Figure -->
-<div style="text-align: center;">
-<img style="height: 300px;" alt="" src="qual_results.png">
-</div>
 <br><br>
+A success for our project would not only to have a fully working implementation of a visual odometry algorithm, but to find areas of improvement for our algorithm and to develop an understanding of the reasoning behind those improvements. Ultimately we aim to develop an algorithm that can predict the poses of the camera throughout a video sequence and to understand and build upon areas of potential improvement.
+
 
 
 
 
   <hr>
   <footer>
-  <p>© You Name Here</p>
+  <p>© Akhilesh Aji, Ashwin Jeyaseelan, Bhavya Bahl</p>
   </footer>
 </div>
 </div>
