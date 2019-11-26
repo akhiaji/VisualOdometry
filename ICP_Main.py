@@ -60,7 +60,6 @@ def calcTransform(img2, img1, h2, h1, fx, fy, cx, cy):
         R = V_t.T @ U.T @ R
         if np.linalg.det(R) < 0:
             V = V_t.T
-            pdb.set_trace()
             V[:,2] *= -1
             R = V @ U.T @ R
         t = X_2[0:3] - R @ X_1[0:3]
@@ -231,6 +230,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     positions, output_data = ICP(args.path, args.fx, args.fy, args.cx, args.cy, args.x, args.y, args.z, args.q1, args.q2, args.q3, args.q4)
+    df = pd.DataFrame(output_data)
+    df = df.round(6)
+    df.to_csv(args.path.split('/')[-1] + "_results.txt", header=False, index=False, sep=' ')
     error, error_summed = errorPerStep(output_data, args.path + "/groundtruth.txt", True)
     f, ax = plt.subplots(2,2)
     df = pd.read_csv(args.path + "/groundtruth.txt", header=None, delim_whitespace=True, comment='#')
