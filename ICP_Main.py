@@ -101,10 +101,11 @@ def ICP(path, fx, fy, cx, cy, x, y, z, q1, q2, q3, q4):
                 print(i)
             position = position @ transformation
 
+            # real time plotting
             draw_x, draw_y = position[0:2, 3]
-            ax[0].scatter(draw_x, draw_y, c = 'bcbd22')
+            ax[0].scatter(draw_x, draw_y, c = 'blue')
             ax[1].imshow(rgb)
-            plt.pause(0.04)
+            plt.pause(0.03)
 
             try:
                 r = Quaternion(matrix=position[0:3, 0:3])
