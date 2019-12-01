@@ -84,6 +84,9 @@ def ICP(path, fx, fy, cx, cy, x, y, z, q1, q2, q3, q4):
     positions = []
     output_data = []
     i = 0
+
+    f, ax = plt.subplots(2)
+
     # K = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]])
     for rgb_name, h_name in zip(rgb_files, depth_files):
         i += 1
@@ -97,13 +100,21 @@ def ICP(path, fx, fy, cx, cy, x, y, z, q1, q2, q3, q4):
             if np.linalg.det(transformation[0:3, 0:3]) < 0:
                 print(i)
             position = position @ transformation
+
+            draw_x, draw_y = position[0:2, 3]
+            ax[0].scatter(draw_x, draw_y, c = 'bcbd22')
+            ax[1].imshow(rgb)
+            plt.pause(0.04)
+
             try:
-                r = Quaternion(matrix=position[0:3,0:3])
+                r = Quaternion(matrix=position[0:3, 0:3])
                 rotation = r
             except ValueError:
                 print("Rotation Error")
                 position[0:3,0:3] = rotation.rotation_matrix
+
             positions.append((position[0:3, 3], rotation.elements))
+
             output = np.zeros((8))
             output[0] = float(rgb_name[:-4])
             output[1:4] = position[0:3, 3]
@@ -113,6 +124,8 @@ def ICP(path, fx, fy, cx, cy, x, y, z, q1, q2, q3, q4):
             last_h = h
         if i % 50 == 0:
             print(i)
+    
+    #plt.show()
     return positions, output_data
 
 def errorPerStep(outputData, groundtruth, aligned=False):
@@ -215,18 +228,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='''
     Script runs Visual Odometry with the appropriate settings
     ''')
-    parser.add_argument('--path', help='directory with the data', required=True)
+    parser.add_argument('--path', help='directory with the data', default='rgbd_dataset_freiburg1_floor', type=str)
     parser.add_argument('--fx', help='focal length fx', default=517.3, type=float)
     parser.add_argument('--fy', help='focal length fy', default=516.5, type=float)
     parser.add_argument('--cx', help='optical center cx', default=318.6, type=float)
     parser.add_argument('--cy', help='optical center cy', default=255.3, type=float)
-    parser.add_argument('--x', help='initial x position', default=0, type=float)
-    parser.add_argument('--y', help='initial y position', default=0, type=float)
-    parser.add_argument('--z', help='initial z position', default=0, type=float)
-    parser.add_argument('--q1', help='first initial quaternion component', default=0, type=float)
-    parser.add_argument('--q2', help='seond initial quaternion component', default=0, type=float)
-    parser.add_argument('--q3', help='third initial quaternion component', default=0, type=float)
-    parser.add_argument('--q4', help='fourth initial quaternion component', default=0, type=float)
+    parser.add_argument('--x', help='initial x position', default= 1.2764, type=float)
+    parser.add_argument('--y', help='initial y position', default= -0.9763, type=float)
+    parser.add_argument('--z', help='initial z position', default= 0.6837, type=float)
+    parser.add_argument('--q1', help='first initial quaternion component', default= 0.8187, type=float)
+    parser.add_argument('--q2', help='seond initial quaternion component', default= 0.3639, type=float)
+    parser.add_argument('--q3', help='third initial quaternion component', default= -0.1804, type=float)
+    parser.add_argument('--q4', help='fourth initial quaternion component', default= -0.4060, type=float)
     args = parser.parse_args()
 
     positions, output_data = ICP(args.path, args.fx, args.fy, args.cx, args.cy, args.x, args.y, args.z, args.q1, args.q2, args.q3, args.q4)
