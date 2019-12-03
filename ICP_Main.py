@@ -102,10 +102,10 @@ def ICP(path, fx, fy, cx, cy, x, y, z, q1, q2, q3, q4):
             position = position @ transformation
 
             # real time plotting
-            draw_x, draw_y = position[0:2, 3]
-            ax[0].scatter(draw_x, draw_y, c = 'blue')
-            ax[1].imshow(rgb)
-            plt.pause(0.03)
+            #draw_x, draw_y = position[0:2, 3]
+            #ax[0].scatter(draw_x, draw_y, c = 'blue')
+            #ax[1].imshow(rgb)
+            #plt.pause(0.03)
 
             try:
                 r = Quaternion(matrix=position[0:3, 0:3])
@@ -262,11 +262,12 @@ if __name__ == '__main__':
     y = np.array(pos_points).T[1]
     z = np.array(pos_points).T[2]
     c = range(len(x))
-    ax[1][0].set_title("Visual Odom")
-    ax[1][0].scatter(x, y,c=c,cmap='viridis')
-    ax[0][1].plot(range(len(error_summed)), error_summed)
-    ax[0][1].set_title("Accumulated Error")
-    ax[1][1].plot(range(len(error)), error)
-    ax[1][1].set_title("Error Per Step")
+    ax[0][1].set_title("Visual Odom")
+    ax[0][1].scatter(x, y,c=c,cmap='viridis')
+    ax[1][1].plot(range(len(error_summed)), error_summed)
+    ax[1][1].set_title("Accumulated Error")
+    ax[1][0].plot(range(len(error)), error)
+    ax[1][0].set_title("Error Per Step")
+    f.tight_layout()
     f.savefig(args.path.split('/')[-1] + "_charts")
     f.show()

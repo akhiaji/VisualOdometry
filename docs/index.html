@@ -14,6 +14,19 @@
 body {
 padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
 .vis {
 color: #3366CC;
 }
@@ -88,37 +101,131 @@ This problem is particularly interesting because it combines many of the tools w
 <br><br>
 <!-- Results -->
 <h3>Experiments and results</h3>
-Upon implementing our visual odometry algorithm, we will assess its performance on the thirteen unseen datasets by comparing the ground truth labels with the labels our system generates at each frame. Success in our task will be determined by a low error between our predicted poses and the ground truth poses.
-<br></br>
 
-Due to the availability of optimized and highly reliable implementations we plan to use OpenCV for a majority of the tools required to put the system together. Primarily, for feature detection, (which we utilize when comparing pairs of frames to determine the translation between them), we plan on using OpenCV's implementation of the SIFT algorithm.
-<br></br>
-
-The datasets we will be using come from the computer vision group of the Technical University of Munich Department of Informatics [1]. They provide several videos with rgb-d data as well as ground truth camera pose information. While implementing and tuning our dataset, we will use sequence <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg1_floor">freiburg1_floor</a>, which is a video going over the wooden floor of an office as well as <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg2_large_no_loop">freiburg2_large_no_loop</a>. The dataset only include training and testing poses. The testing poses can only be evaluated using an online tool on the dataset webpage.
-
+We tested our algorithm on the <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg1_floor">freiburg1_floor</a> dataset from the computer vision group of the Technical University of Munich Department of Informatics [1]. The data includes a video going over the wooden floor of an office, with rgb-data and ground truth camera pose information. 
 <br><br>
 
 <!-- Main Results Figure -->
 <div style="text-align: center;">
 <img style="height: 300px;" alt="" src="data.png">
-<img style="height: 300px;" alt="" src="data2.png">
 </div>
-<br><br>
-
-To evaluate our approach, we will compare our frame position tags to the ground truth positions provided in the dataset using the root mean squared error over multiple trials. If there are any major outliers in the dataset, we will additionally use other more robust metrics such as the median error or average error without the square. A common issue that we might face with our experiments is drift. Since we’re incrementally computing the pose after each frame, any errors we make will affect the pose calculations in the next frame and so on. These errors can accumulate and cause our overall estimated path to significantly differ from the actual path. If this turns out to be an issue with our dataset, then we will look into methods to combat this such as ‘sliding window adjustment’, in which we group a window of previous frames and backpropagate a measure of error such as RMSE to correct and update previous pose calculations.
-
-<br><br>
-A success for our project would not only to have a fully working implementation of a visual odometry algorithm, but to find areas of improvement for our algorithm and to develop an understanding of the reasoning behind those improvements. Ultimately we aim to develop an algorithm that can predict the poses of the camera throughout a video sequence and to understand and build upon areas of potential improvement.
-<br><br>
-<h3>Progress</h3>
-At this point we have implemented two different versions of the algorithm. The first is based on the epipolar geometry discussed in class. This method does not take advantage of the depth component of the dataset. While implementng this we were not able to get consistent results. We have decided not to continue pursuing this path as it does not take full advantage of the data we are given, and was the worse performing of the two routes we pursued. The second method which is the one we initially proposed in our approach is based on the work from Arun et al.[2] As you can see the results below are still not accurate, however several paths and continuity in the motion is preserved. The image below compares out recreated odometry with the ground truth. The color is the corresponding frame number 0 is black and the last timestep is in white. In both ground truth and our recreation the path start by going to the left then moving in the y dimension before jumping back to the right and finishing the path on that side. The more important issue is with the scaling of the path. While our solution ranges from -1,250 to 1,300 in the x dimension the ground truth ranges from -0.75 to 2. Due to the lack of success with this method we have decided to attempt a third implementation that based off of the work by Steinbrucker et al. [3]
 <br>
+We have implemented two different versions of the algorithm. The first is based on the epipolar geometry discussed in class. This method does not take advantage of the depth component of the dataset. While implementng this we were not able to get consistent results. We have decided not to continue pursuing this path as it does not take full advantage of the data we are given, and was the worse performing of the two routes we pursued. The second method which is the one we initially proposed in our approach is based on the work from Arun et al.[2].
+<br><br>
 The code that we wrote can be found <a href="https://github.com/akhiaji/VisualOdometry"> here</a>. The SIFT based feature matching code is based on [4].
-<br>
+<br><br>
+The image below compares our recreated odometry with the ground truth x, y coordinates of the camera. In both ground truth and our recreation, the path starts by going to the left then moving in the y dimension before jumping back to the right and finishing the path on that side. The results aren’t perfect, but our algorithm does a good job predicting the overall path. It’s also important to consider the fact that even the ground truth isn’t a continuous plot, due to the video jumping frames in the middle of the sequence. 
+<br><br>
+
 <div style="text-align: center;">
-<img style="height: 400px;" alt="" src="Comparison.jpg">
+<img style="height: 600px;" alt="" src="comparison.png">
 </div>
 <br><br>
+Below is a plot of the difference between our estimated path and the ground truth 2D camera pose coordinates. 
+
+<div style="text-align: center;">
+  <img style="height: 400px;" alt="" src="path_diff.png">
+</div>
+
+<br><br>
+
+<br><br>
+As shown in the plots above and below, the difference increases over time. For roughly the first half of the trajectory, the difference is small until it jumps to the right and the error accumulates. 
+<br><br>
+
+<div style="text-align: center;">
+  <img style="height: 200px;" alt="" src="error_time.png">
+</div>
+
+<br><br>
+
+The error per step helps explain this. Fortunately, during most of the time steps, the error is close to 0. 
+But at certain steps, there are spikes in the error, such as around 750 and 1000. A possible cause for this 
+issue is that the video skipped a bunch of frames at these time steps, resulting in an inaccurate transformation 
+matrix across the subsequent frames at those time steps and consequently incorrect pose predictions. 
+<br><br>
+
+Below is a table of our metrics (in meters) to further evaluate our algorithm. 
+The root mean squared error is sensitive to outliers, which our data clearly has, 
+as shown by the standard deviation in error and the difference between the minimum 
+and maximum error values. Therefore, the mean and median are helpful to look at, 
+which are around 0.4 meters.
+<br><br>
+<table style="width:50%">
+  <tr>
+    <th>Metrics for ratio test value of 0.4</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>Absolute translational error RMSE</td>
+    <td>0.613676 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error mean</td>
+    <td>0.498433 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error median</td>
+    <td>0.415210 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error std</td>
+    <td>0.357998 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error minimum</td>
+    <td>0.026930 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error max</td>
+    <td>2.755501 m</td>
+  </tr>
+</table>
+<br><br>
+
+One parameter that we experimented with was the ratio value utilized in the ratio test, when selecting matching feature points between frames. 
+The idea behind the ratio test is to filter out bad matches based on a threshold ratio between the best and second best match distance [5]. 
+Decreasing the ratio value results in a higher threshold, which helps filter out more ambiguous points because in order for a match to be reliable, 
+the closest point in a correct match should be much closer than any other incorrect point [5]. The above list has better results with a ratio value of 0.4. 
+With an increased ratio value of 0.5, the errors increase as shown below:
+
+<br><br>
+
+<table style="width:50%">
+  <tr>
+    <th>Metrics for ratio test value of 0.5</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>Absolute translational error RMSE</td>
+    <td>1.781425 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error mean</td>
+    <td>1.461322 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error median</td>
+    <td>1.088532 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error std</td>
+    <td>1.018830 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error minimum</td>
+    <td>0.43635 m</td>
+  </tr>
+  <tr>
+    <td>Absolute translational error max</td>
+    <td>3.686539 m</td>
+  </tr>
+</table>
+
+<br><br>
+
+<h3>Conclusion and future work</h3>
+
 <h3> References </h3>
 [1]Sturm, Jürgen, Nikolas Engelhard, Felix Endres, Wolfram Burgard, and Daniel Cremers. "A benchmark for the evaluation of RGB-D SLAM systems." In 2012 IEEE/RSJ International Conference on Intelligent Robots and Systems, pp. 573-580. IEEE, 2012.
 <br>
@@ -127,6 +234,8 @@ The code that we wrote can be found <a href="https://github.com/akhiaji/VisualOd
 [3] Steinbrücker, Frank, Jürgen Sturm, and Daniel Cremers. "Real-time visual odometry from dense RGB-D images." In 2011 IEEE International Conference on Computer Vision Workshops (ICCV Workshops), pp. 719-722. IEEE, 2011.
 <br>
 [4] <a href="https://docs.opencv.org/3.4/da/df5/tutorial_py_sift_intro.html">https://docs.opencv.org/3.4/da/df5/tutorial_py_sift_intro.html</a>
+<br>
+[5] Lowe, G. David, "Distinctive Image Features from Scale-Invariant Keypoints." In 2004 International Journal of Computer Vision.
 
 
   <hr>
