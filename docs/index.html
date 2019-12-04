@@ -142,7 +142,7 @@ As shown in the plots above and below, the difference increases over time. For r
 The error per step helps explain this. Fortunately, during most of the time steps, the error is close to 0. 
 But at certain steps, there are spikes in the error, such as around 750 and 1000. A possible cause for this 
 issue is that the video skipped a bunch of frames at these time steps, resulting in an inaccurate transformation 
-matrix across the subsequent frames at those time steps and consequently incorrect pose predictions. 
+matrix across the subsequent frames at those time steps and consequently incorrect pose predictions. This error offsets every pose for the rest of the path. For example, if only the first 750 estimated poses are used the Absolute translational error RMSE is 0.0857 meters in addition the 250 poses between 750 and 1000 the error is 0.12. As you can see this means that before and after the spike in error the tracking is very good. As a result, in a real world situation in which every frame is being processed the error would remain very low.
 <br><br>
 
 Below is a table of our metrics (in meters) to further evaluate our algorithm. 
@@ -221,10 +221,10 @@ With an increased ratio value of 0.5, the errors increase as shown below:
     <td>3.686539 m</td>
   </tr>
 </table>
-
 <br><br>
 
 <h3>Conclusion and future work</h3>
+In conclusion a fairly accurate tracker can be developed using RGB-D data. While the system still has some issues to work out for hundreds of frames at a time the system was able to accurately track the movement around an indoor environment. The main issue to tackle with the current model is getting rid of the spikes. This requires significantly more robustness. There are several papers that discuss how to achieve this robustness that we were not able to implement due to time constraints. One of the prime candidates to boost the accuracy would be to implement the salient point detection described by Li et al.[6]
 
 <h3> References </h3>
 [1]Sturm, Jürgen, Nikolas Engelhard, Felix Endres, Wolfram Burgard, and Daniel Cremers. "A benchmark for the evaluation of RGB-D SLAM systems." In 2012 IEEE/RSJ International Conference on Intelligent Robots and Systems, pp. 573-580. IEEE, 2012.
@@ -236,6 +236,8 @@ With an increased ratio value of 0.5, the errors increase as shown below:
 [4] <a href="https://docs.opencv.org/3.4/da/df5/tutorial_py_sift_intro.html">https://docs.opencv.org/3.4/da/df5/tutorial_py_sift_intro.html</a>
 <br>
 [5] Lowe, G. David, "Distinctive Image Features from Scale-Invariant Keypoints." In 2004 International Journal of Computer Vision.
+<br>
+[6] Li, Shile, and Dongheui Lee. "Fast visual odometry using intensity-assisted iterative closest point." IEEE Robotics and Automation Letters 1.2 (2016): 992-999.
 
 
   <hr>
