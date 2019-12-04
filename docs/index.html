@@ -99,7 +99,7 @@ Other approaches are based on first calculating the corresponding points between
 
   where \(R_{k,k-1}\) is a \(3 \times 3\) rotation matrix and \(t_{k,k-1} \in \mathbb{R}^{3 \times 1}\) is the translation vector. An important component of visual odometry is to compute the relative transformation \(T_{k,k-1}\) from the images \(I_{k}\) and \(I_{k-1}\). To compute the camera pose at any time instant, we apply the transformations computed at each time step to initial pose. Let the set of camera poses be \(C_{0:n} = \left\{C_0, \ldots, C_n\right\}\), then \(C_n = C_{n-1}T_{n,n-1}\), with \(C_0\) being the initial camera pose, which can be set arbitrarily.
   <br><br>
-  To compute transformations between images, we will first extract salient features from RGB images, which are likely to match across consecutive time instants. This will give us the (x,y) pixel coordinates of the features. We will concatenate the depth information to the (x,y) location of each of the keypoints detected to get 3D point cloud with respect to the camera frame as described <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats#intrinsic_camera_calibration_of_the_kinect">here</a>. This webpage explains how to go from 2D points to 3D point clouds. The most relevant features for visual odometry are corners and blobs because their positions in can be measured accurately. There is vast literature on both corner detectors (like Moravec, Forstner, Harris, and FAST) and blob detectors(SIFT, SURF, CENSURE). We used SIFT for feature detector for our implementation. After detecting features, we will match features between images at consecutive time instants using the similarity of feature descriptor(SIFT). 
+  To compute transformations between images, we first extract salient features from RGB images, which are likely to match across consecutive time instants. This will give us the (x,y) pixel coordinates of the features. We will concatenate the depth information to the (x,y) location of each of the keypoints detected to get 3D point cloud with respect to the camera frame as described <a href="https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats#intrinsic_camera_calibration_of_the_kinect">here</a>. This webpage explains how to go from 2D points to 3D point clouds. The most relevant features for visual odometry are corners and blobs because their positions in can be measured accurately. There is vast literature on both corner detectors (like Moravec, Forstner, Harris, and FAST) and blob detectors(SIFT, SURF, CENSURE). We used SIFT for feature detector for our implementation. After detecting features, we match features between images at consecutive time instants using the similarity of feature descriptor(SIFT). 
   <br><br>
   After computing the 3D-to-3D correspondences between the features of the images, we want to find \(T_k\) that minimizes the \(L_2\) distance between the two 3-D feature sets. In other words, we have the point sets \(P\) and \(P'\) such that: 
   \(P'_{i} = RP_{i} + t\). We want to find \(R\) and \(t\) which minimizes \(L\):
@@ -164,12 +164,14 @@ and maximum error values. Therefore, median is also helpful to look at,
 which is around 0.4 meters.
 
 <br><br>
-
-We also experimented with was the ratio value utilized in the ratio test, when selecting matching feature points between frames. 
+One parameter that we experimented with was the ratio value utilized in the ratio test, when selecting matching feature points between frames. 
+If the distance between matched features isn't significantly greater than the product of the ratio value and the distance between the second best match, 
+then the matched pair of features is discarded.
 The idea behind the ratio test is to filter out bad matches based on a threshold ratio between the best and second best match distance [5]. 
 Decreasing the ratio value results in a higher threshold, which helps filter out more ambiguous points because in order for a match to be reliable, 
 the closest point in a correct match should be much closer than any other incorrect point [5]. The above list has better results with a ratio value of 0.4. 
-With an increased ratio value of 0.5, the errors increase as can be seen in tables below.
+We decreased our ratio value as low as we could until there was no more room for improvement in results, and the ratio value of 0.4 gave the best results.
+With an increased ratio value of 0.5, the errors increase as shown below:
 <br><br>
 <table style="width:50%">
   <tr>
