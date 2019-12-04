@@ -237,10 +237,6 @@ With an increased ratio value of 0.5, the errors increase as can be seen in tabl
 <br><br>
 
 <h3>Conclusion and future work</h3>
-<<<<<<< HEAD
-In conclusion a fairly accurate tracker can be developed using RGB-D data. While the system still has some issues to work out for hundreds of frames at a time the system was able to accurately track the movement around an indoor environment. The main issue to tackle with the current model is getting rid of the spikes. This requires significantly more robustness. There are several papers that discuss how to achieve this robustness that we were not able to implement due to time constraints. One of the prime candidates to boost the accuracy would be to implement the salient point detection described by Li et al.[6]
-
-=======
 In this project, we implemented an incremental approach to visual odometry using transformations between consecutive time frames of a video. The average translational error(mean of absolute difference between grouth truth position and predicted position) for our approach is around 0.5 metres for our dataset. The presence of fast camera movements in the video sequence distort our results a bit after a certain point of time. This can be seen by the fact that our implementation had an error of only 0.1 metres till the first 600 time steps. Currently, the feature detection and matching are the two computationally intensive steps in our implementation. Some other approaches use other feature detectors like GFTT and BRISK feature desciptor which provide a good tradeoff between accuracy and computation time.
 <br>
 Some ways in which our implementation can be improved are as follows:
@@ -248,7 +244,6 @@ Some ways in which our implementation can be improved are as follows:
   <li>Creating a motion model for the camera by using optical flow field and doing it at various levels from coarse to fine</li>
   <li>Using Bundle adjustment for refining the predicted poses: We can represent the camera poses as a pose graph where the pose forms the node and the transformations form the edges. We can then optimize for camera pose parameters by minimizing the cost funtion \(\sum_{e_{ij}}\left\|C_{i}-T_{e_{ij}} C_{j}\right\|^{2}\). Non linear optimization algorithms can solve for the required parameters</li>
 </ul> 
->>>>>>> 4fd0f98991533e77b88c099dbec5e76b76261ea7
 <h3> References </h3>
 [1]Sturm, Jürgen, Nikolas Engelhard, Felix Endres, Wolfram Burgard, and Daniel Cremers. "A benchmark for the evaluation of RGB-D SLAM systems." In 2012 IEEE/RSJ International Conference on Intelligent Robots and Systems, pp. 573-580. IEEE, 2012.
 <br>
